@@ -70,9 +70,10 @@ app.get('/sortie', (req, res) => {
       nbarticle: req.body.nbarticle,
       motifaction:req.body.motifaction,
       totalaction:req.body.totalaction
-      
   
     };
+    console.log("test")
+
     // Validation rapide des données avant l'insertion
     if (!donnee.idarticle || !donnee.nbarticle || !donnee.motifaction || !donnee.totalaction) {
       return res.status(400).json({ msg: "Toutes les données doivent être fournies." });
