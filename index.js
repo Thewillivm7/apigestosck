@@ -30,7 +30,7 @@ app.get('/entree', (req, res) => {
   });
 });
 app.get('/sortie', (req, res) => {
-    const query = 'SELECT dateaction,article.desigantionarticle,nbarticle,totalaction FROM `action` INNER JOIN article on article.idarticle=action.idarticle WHERE motifaction=2 ORDER BY action.dateaction DESC;';
+    const query = 'SELECT dateaction,article.designationarticle,nbarticle,totalaction FROM `action` INNER JOIN article on article.idarticle=action.idarticle WHERE motifaction=2 ORDER BY action.dateaction DESC;';
     connection.query(query, (error, results) => {
       if (error) {
         console.error(error);
@@ -39,9 +39,9 @@ app.get('/sortie', (req, res) => {
         res.json(results);
       }
     });
-  });
-  app.get('/stock', (req, res) => {
-    const query = 'SELECT article.idarticle,article.desigantionarticle,article.stockalertearticle,SUM(CASE WHEN motifaction = 1 THEN nbarticle ELSE 0 END) - SUM(CASE WHEN motifaction = 2 THEN nbarticle ELSE 0 END) AS reste FROM action INNER JOIN article on article.idarticle=action.idarticle WHERE action.idarticle = action.idarticle GROUP BY action.idarticle';
+});
+app.get('/stock', (req, res) => {
+    const query = 'SELECT article.idarticle,article.designationarticle,article.stockalertearticle,SUM(CASE WHEN motifaction = 1 THEN nbarticle ELSE 0 END) - SUM(CASE WHEN motifaction = 2 THEN nbarticle ELSE 0 END) AS reste FROM action INNER JOIN article on article.idarticle=action.idarticle WHERE action.idarticle = action.idarticle GROUP BY action.idarticle';
     connection.query(query, (error, results) => {
       if (error) {
         console.error(error);
@@ -50,9 +50,9 @@ app.get('/sortie', (req, res) => {
         res.json(results);
       }
     });
-  });
-  app.get('/article', (req, res) => {
-    const query = 'SELECT idarticle,desigantionarticle FROM `article` WHERE 1';
+});
+app.get('/article', (req, res) => {
+    const query = 'SELECT * FROM `article` WHERE 1';
     connection.query(query, (error, results) => {
       if (error) {
         console.error(error);
@@ -61,8 +61,8 @@ app.get('/sortie', (req, res) => {
         res.json(results);
       }
     });
-  });
-  app.post('/newentree', (req, res) => {
+});
+app.post('/newentree', (req, res) => {
     let query="INSERT INTO action SET ?";
     console.log(req.body);
     let donnee={
@@ -72,7 +72,6 @@ app.get('/sortie', (req, res) => {
       totalaction:req.body.totalaction
   
     };
-    console.log("test")
 
     // Validation rapide des données avant l'insertion
     if (!donnee.idarticle || !donnee.nbarticle || !donnee.motifaction || !donnee.totalaction) {
@@ -85,9 +84,29 @@ app.get('/sortie', (req, res) => {
           res.json({msg:"entrée bien ajouté"});
         }
       });
-    });
-
-    app.post('/newsortie', (req, res) => {
+});
+app.post('/newarticle', (req, res) => {
+      let query="INSERT INTO article SET ?";
+      console.log(req.body);
+      let donnee={
+        designationarticle: req.body.designationarticle,
+        stockalertearticle: req.body.stockalertearticle,
+    
+      };
+  
+      // Validation rapide des données avant l'insertion
+      if (!donnee.designationarticle || !donnee.stockalertearticle) {
+        return res.status(400).json({ msg: "Toutes les données doivent être fournies." });
+    }
+        // const newProduct = {content: req.body.content};
+        connection.query(query,donnee,(error, results) => {
+          if (error)res.json({msg:error});
+          else {
+            res.json({msg:"article bien ajouté"});
+          }
+        });
+});
+app.post('/newsortie', (req, res) => {
       let query="INSERT INTO action SET ?";
       console.log(req.body);
       let donnee={
@@ -108,7 +127,7 @@ app.get('/sortie', (req, res) => {
             res.json({msg:"sortie bien ajouté"});
           }
         });
-      });
+});
 
 // Lancer le serveur
 app.listen(3000,'0.0.0.0',() => {
